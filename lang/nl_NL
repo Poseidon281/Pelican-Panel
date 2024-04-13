@@ -1,19 +1,15 @@
 <?php
 
 return [
-    'notices' => [
-        'imported' => 'Het importeren van dit ei en de bijbehorende variabelen is geslaagd.',
-        'updated_via_import' => 'Dit Egg is bijgewerkt met behulp van het opgegeven bestand.',
-        'deleted' => 'Het gevraagde Egg is met succes uit het paneel verwijderd.',
-        'updated' => 'Egg configuratie is met succes bijgewerkt.',
-        'script_updated' => 'Egg install script is bijgewerkt en wordt uitgevoerd wanneer er servers worden geïnstalleerd.',
-        'egg_created' => 'Een nieuw Egg is met succes geplaatst. U moet elke lopende daemons opnieuw opstarten om dit nieuwe ei toe te passen.',
+    'validation' => [
+        'fqdn_not_resolvable' => 'The FQDN or IP address provided does not resolve to a valid IP address.',
+        'fqdn_required_for_ssl' => 'A fully qualified domain name that resolves to a public IP address is required in order to use SSL for this node.',
     ],
-    'variables' => [
-        'notices' => [
-            'variable_deleted' => 'De variabele ":variable" is verwijderd en zal niet meer beschikbaar zijn voor servers na rebuilt.',
-            'variable_updated' => 'De variabele ":variable" is bijgewerkt. Je moet elke server opnieuw opbouwen met deze variabele om wijzigingen toe te passen.',
-            'variable_created' => 'Er is een nieuwe variabele aangemaakt en toegewezen aan deze Egg.',
-        ],
+    'notices' => [
+        'allocations_added' => 'Allocations have successfully been added to this node.',
+        'node_deleted' => 'Node has been successfully removed from the panel.',
+        'node_created' => 'Successfully created new node. You can automatically configure the daemon on this machine by visiting the \'Configuration\' tab. <strong>Before you can add any servers you must first allocate at least one IP address and port.</strong>',
+        'node_updated' => 'Node information has been updated. If any daemon settings were changed you will need to reboot it for those changes to take effect.',
+        'unallocated_deleted' => 'Deleted all un-allocated ports for <code>:ip</code>.',
     ],
 ];
