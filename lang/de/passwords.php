@@ -11,9 +11,9 @@ return [
     | has failed, such as for an invalid token or invalid new password.
     |
     */
-    'password' => 'Las contraseñas deben tener al menos seis caracteres y coincidir con la confirmación.',
-    'reset' => '¡Tu contraseña ha sido restablecida!',
-    'sent' => '¡Hemos enviado por correo electrónico el enlace para restablecer tu contraseña!',
-    'token' => 'Este token de restablecimiento de contraseña no es válido.',
-    'user' => "No podemos encontrar un usuario con esa dirección de correo electrónico.",
+    'password' => 'Passwörter müssen mindestens sechs Zeichen lang sein und mit der Bestätigung übereinstimmen.',
+    'reset' => 'Ihr Passwort wurde zurückgesetzt!',
+    'sent' => 'Wir haben Ihren Link zum Zurücksetzen des Passworts per E-Mail gesendet!',
+    'token' => 'Das Passwort Reset Token ist ungültig.',
+    'user' => "Es konnte kein Benutzer mit dieser E-Mail-Adresse gefunden werden.",
 ];
