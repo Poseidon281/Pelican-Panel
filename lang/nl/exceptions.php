@@ -1,31 +1,31 @@
 <?php
 
 return [
-    'daemon_connection_failed' => 'There was an exception while attempting to communicate with the daemon resulting in a HTTP/:code response code. This exception has been logged.',
+    'daemon_connection_failed' => 'Er is een fout opgetreden tijdens het communiceren met de daemon wat resulteert in een HTTP/:code response code. Deze fout is opgeslagen.',
     'node' => [
-        'servers_attached' => 'A node must have no servers linked to it in order to be deleted.',
-        'daemon_off_config_updated' => 'The daemon configuration <strong>has been updated</strong>, however there was an error encountered while attempting to automatically update the configuration file on the Daemon. You will need to manually update the configuration file (config.yml) for the daemon to apply these changes.',
+        'servers_attached' => 'Een node moet geen actieve servers meer hebben voordat deze kan worden verwijderd.',
+        'daemon_off_config_updated' => 'De daemonconfiguratie <strong>is bijgewerkt</strong>, er is echter een fout opgetreden bij het automatisch bijwerken van het configuratiebestand op de Daemon. U moet handmatig het configuratiebestand bijwerken (config.yml) voor de daemon om deze veranderingen toe te passen.',
     ],
     'allocations' => [
-        'server_using' => 'A server is currently assigned to this allocation. An allocation can only be deleted if no server is currently assigned.',
-        'too_many_ports' => 'Adding more than 1000 ports in a single range at once is not supported.',
-        'invalid_mapping' => 'The mapping provided for :port was invalid and could not be processed.',
-        'cidr_out_of_range' => 'CIDR notation only allows masks between /25 and /32.',
-        'port_out_of_range' => 'Ports in an allocation must be greater than 1024 and less than or equal to 65535.',
+        'server_using' => 'Een server is momenteel toegewezen aan deze toewijzing. Een toewijzing kan alleen worden verwijderd als er momenteel geen server is toegewezen.',
+        'too_many_ports' => 'Meer dan 1000 poorten binnen één bereik toevoegen wordt niet ondersteund.',
+        'invalid_mapping' => 'De opgegeven toewijzing voor :port was ongeldig en kon niet worden verwerkt.',
+        'cidr_out_of_range' => 'CIDR notatie staat alleen subnet masks toe tussen /25 en /32.',
+        'port_out_of_range' => 'De poorten in een toewijzing moeten groter zijn dan 1024 en minder dan of gelijk zijn aan 65535.',
     ],
     'egg' => [
-        'delete_has_servers' => 'An Egg with active servers attached to it cannot be deleted from the Panel.',
-        'invalid_copy_id' => 'The Egg selected for copying a script from either does not exist, or is copying a script itself.',
-        'has_children' => 'This Egg is a parent to one or more other Eggs. Please delete those Eggs before deleting this Egg.',
+        'delete_has_servers' => 'Een egg met actieve servers gekoppeld kan niet worden verwijderd uit het paneel.',
+        'invalid_copy_id' => 'De egg dat geselecteerd is om een script van te kopiëren bestaat niet, of kopieert een script zelf.',
+        'has_children' => 'Deze egg is het hoofd van een of meer eggs. Verwijder deze eggs voor het verwijderen van deze egg.',
     ],
     'variables' => [
-        'env_not_unique' => 'The environment variable :name must be unique to this Egg.',
-        'reserved_name' => 'The environment variable :name is protected and cannot be assigned to a variable.',
-        'bad_validation_rule' => 'The validation rule ":rule" is not a valid rule for this application.',
+        'env_not_unique' => 'De omgevingsvariabele :name moet uniek zijn voor deze egg.',
+        'reserved_name' => 'De omgevingsvariabele :name is beveiligd en kan niet worden toegewezen aan een variabele.',
+        'bad_validation_rule' => 'De validatieregel ":rule" is geen geldige regel voor deze toepassing.',
     ],
     'importer' => [
-        'json_error' => 'There was an error while attempting to parse the JSON file: :error.',
-        'file_error' => 'The JSON file provided was not valid.',
+        'json_error' => 'Er is een fout opgetreden bij het parsen van het JSON-bestand: :error.',
+        'file_error' => 'Het opgegeven JSON-bestand is niet geldig.',
         'invalid_json_provided' => 'The JSON file provided is not in a format that can be recognized.',
     ],
     'subusers' => [
