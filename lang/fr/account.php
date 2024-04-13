@@ -2,13 +2,13 @@
 
 return [
     'email' => [
-        'title' => 'Update your email',
-        'updated' => 'Your email address has been updated.',
+        'title' => 'Mettre à jour votre adresse e-mail',
+        'updated' => 'Votre adresse e-mail a été mise à jour.',
     ],
     'password' => [
-        'title' => 'Change your password',
-        'requirements' => 'Your new password should be at least 8 characters in length.',
-        'updated' => 'Your password has been updated.',
+        'title' => 'Modifier votre mot de passe',
+        'requirements' => 'Votre nouveau mot de passe doit comporter au moins 8 caractères.',
+        'updated' => 'Votre mot de passe a été mis à jour.',
     ],
     'two_factor' => [
         'button' => 'Configure 2-Factor Authentication',
@@ -18,11 +18,11 @@ return [
         'setup' => [
             'title' => 'Setup two-factor authentication',
             'help' => 'Can\'t scan the code? Enter the code below into your application:',
-            'field' => 'Enter token',
+            'field' => 'Saisir un jeton',
         ],
         'disable' => [
             'title' => 'Disable two-factor authentication',
-            'field' => 'Enter token',
+            'field' => 'Saisir un jeton',
         ],
     ],
 ];
