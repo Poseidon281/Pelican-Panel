@@ -124,7 +124,7 @@ return [
         'subuser' => [
             'create' => 'Dodano :email jako drugiego użytkownika.',
             'update' => 'Zaktualizowano uprawnienia dla użytkownika :email',
-            'delete' => 'Removed :email as a subuser',
+            'delete' => 'Usunięto :email jako współpracownika.',
         ],
     ],
 ];
