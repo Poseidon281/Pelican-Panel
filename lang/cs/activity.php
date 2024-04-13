@@ -8,38 +8,38 @@
  */
 return [
     'auth' => [
-        'fail' => 'Failed log in',
-        'success' => 'Logged in',
-        'password-reset' => 'Password reset',
-        'reset-password' => 'Requested password reset',
-        'checkpoint' => 'Two-factor authentication requested',
-        'recovery-token' => 'Used two-factor recovery token',
-        'token' => 'Solved two-factor challenge',
-        'ip-blocked' => 'Blocked request from unlisted IP address for :identifier',
+        'fail' => 'Přihlášení selhalo',
+        'success' => 'Přihlášení úspěšné',
+        'password-reset' => 'Obnova hesla',
+        'reset-password' => 'Vyžádaná obnova hesla',
+        'checkpoint' => 'Vyžádáno Dvou-faktorové přihlášení',
+        'recovery-token' => 'Použitý dvou-faktorový obnovovací token',
+        'token' => 'Vyřešená dvou-faktorová výzva',
+        'ip-blocked' => 'Blokovaný požadavek z nezalistované IP adresy pro :identifier',
         'sftp' => [
-            'fail' => 'Failed SFTP log in',
+            'fail' => 'Selhalo přihlášení SFTP',
         ],
     ],
     'user' => [
         'account' => [
-            'email-changed' => 'Changed email from :old to :new',
-            'password-changed' => 'Changed password',
+            'email-changed' => 'Email změněn z :old na :new',
+            'password-changed' => 'Heslo změněno',
         ],
         'api-key' => [
-            'create' => 'Created new API key :identifier',
-            'delete' => 'Deleted API key :identifier',
+            'create' => 'Vytvořen nový API klíč :identifier',
+            'delete' => 'Smazán API klíč :identifier',
         ],
         'ssh-key' => [
-            'create' => 'Added SSH key :fingerprint to account',
-            'delete' => 'Removed SSH key :fingerprint from account',
+            'create' => 'Přidán SSH klíč :fingerprint k účtu',
+            'delete' => 'Odebrán SSH klíč :fingerprint z účtu',
         ],
         'two-factor' => [
-            'create' => 'Enabled two-factor auth',
-            'delete' => 'Disabled two-factor auth',
+            'create' => 'Povoleno dvoufaktorové ověření',
+            'delete' => 'Vypnuto dvoufaktorové ověření',
         ],
     ],
     'server' => [
-        'reinstall' => 'Reinstalled server',
+        'reinstall' => 'Přeinstalovaný server',
         'console' => [
             'command' => 'Executed ":command" on the server',
         ],
