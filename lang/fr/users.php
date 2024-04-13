@@ -2,10 +2,10 @@
 
 return [
     'permissions' => [
-        'websocket_*' => 'Allows access to the websocket for this server.',
-        'control_console' => 'Allows the user to send data to the server console.',
-        'control_start' => 'Allows the user to start the server instance.',
-        'control_stop' => 'Allows the user to stop the server instance.',
+        'websocket_*' => 'Autorise l\'accès au Websocket pour ce serveur.',
+        'control_console' => 'Permet à l\'utilisateur d\'envoyer des commandes à la console du serveur.',
+        'control_start' => 'Autorise l\'utilisateur à démarrer l\'instance du serveur.',
+        'control_stop' => 'Autorise l\'utilisateur à arrêter l\'instance du serveur.',
         'control_restart' => 'Allows the user to restart the server instance.',
         'control_kill' => 'Allows the user to kill the server instance.',
         'user_create' => 'Allows the user to create new user accounts for the server.',
