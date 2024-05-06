@@ -8,7 +8,7 @@
  */
 return [
     'auth' => [
-        'fail' => "Fehler beim Anmelden",
+        'fail' => 'Fehler beim Anmelden',
         'success' => 'Angemeldet',
         'password-reset' => 'Passwort zurücksetzen',
         'reset-password' => 'Angefordertes Passwort zurücksetzen',
