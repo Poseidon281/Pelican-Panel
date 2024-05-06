@@ -6,6 +6,7 @@ use App\Filament\Resources\ServerResource;
 use App\Models\Server;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Table;
 use Filament\Tables;
 
@@ -26,12 +27,7 @@ class ListServers extends ListRecords
                             return $server->status;
                         }
 
-                        $statuses = collect($server->retrieveStatus())
-                            ->mapWithKeys(function ($status) {
-                                return [$status['configuration']['uuid'] => $status['state']];
-                            })->all();
-
-                        return $statuses[$server->uuid] ?? 'node_fail';
+                        return $server->retrieveStatus() ?? 'node_fail';
                     })
                     ->icon(fn ($state) => match ($state) {
                         'node_fail' => 'tabler-server-off',
@@ -97,13 +93,22 @@ class ListServers extends ListRecords
                 Tables\Actions\BulkActionGroup::make([
                     // Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ])
+            ->emptyStateIcon('tabler-brand-docker')
+            ->emptyStateDescription('')
+            ->emptyStateHeading('No Servers')
+            ->emptyStateActions([
+                CreateAction::make('create')
+                    ->label('Create Server')
+                    ->button(),
             ]);
     }
     protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make()
-                ->label('Create Server'),
+                ->label('Create Server')
+                ->hidden(fn () => Server::count() <= 0),
         ];
     }
 }

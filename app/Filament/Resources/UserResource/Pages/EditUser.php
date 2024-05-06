@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\UserResource\Pages;
 
+use App\Enums\ServerState;
 use App\Filament\Resources\UserResource;
 use App\Services\Servers\SuspensionService;
 use Filament\Actions;
@@ -70,25 +71,21 @@ class EditUser extends EditRecord
             Actions\DeleteAction::make(),
 
             Actions\Action::make('toggleSuspend')
-                ->hidden(fn (User $user) => $user->is_suspended || $user->root_admin)
-                ->label('Disable User')
+                ->hidden(fn (User $user) => $user->servers()->whereNot('status', ServerState::Suspended)->count() === 0)
+                ->label('Suspend Servers')
                 ->color('warning')
                 ->action(function (User $user) {
-                    $user->is_suspended = true;
-                    $user->save();
-                    foreach ($user->servers as $server) {
+                    foreach ($user->servers()->whereNot('status', ServerState::Suspended)->get() as $server) {
                         resolve(SuspensionService::class)->toggle($server);
                     }
                 }),
 
             Actions\Action::make('toggleUnsuspend')
-                ->hidden(fn (User $user) => !$user->is_suspended || $user->root_admin)
-                ->label('Re-enable User')
+                ->hidden(fn (User $user) => $user->servers()->where('status', ServerState::Suspended)->count() === 0)
+                ->label('Unsuspend Servers')
                 ->color('success')
                 ->action(function (User $user) {
-                    $user->is_suspended = false;
-                    $user->save();
-                    foreach ($user->servers as $server) {
+                    foreach ($user->servers()->where('status', ServerState::Suspended)->get() as $server) {
                         resolve(SuspensionService::class)->toggle($server, SuspensionService::ACTION_UNSUSPEND);
                     }
                 }),

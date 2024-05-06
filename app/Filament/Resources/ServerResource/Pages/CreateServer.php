@@ -12,10 +12,10 @@ use Filament\Forms\Form;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Closure;
 use Filament\Forms;
+use Illuminate\Support\HtmlString;
 
 class CreateServer extends CreateRecord
 {
@@ -41,7 +41,6 @@ class CreateServer extends CreateRecord
                     ->label('Display Name')
                     ->suffixAction(Forms\Components\Actions\Action::make('random')
                         ->icon('tabler-dice-' . random_int(1, 6))
-                        ->color('primary')
                         ->action(function (Forms\Set $set, Forms\Get $get) {
                             $egg = Egg::find($get('egg_id'));
                             $prefix = $egg ? str($egg->name)->lower()->kebab() . '-' : '';
@@ -120,26 +119,30 @@ class CreateServer extends CreateRecord
                         Forms\Components\TextInput::make('allocation_ip')
                             ->datalist(Node::find($get('node_id'))?->ipAddresses() ?? [])
                             ->label('IP Address')
+                            ->inlineLabel()
                             ->ipv4()
                             ->helperText("Usually your machine's public IP unless you are port forwarding.")
                             // ->selectablePlaceholder(false)
                             ->required(),
                         Forms\Components\TextInput::make('allocation_alias')
                             ->label('Alias')
+                            ->inlineLabel()
                             ->default(null)
                             ->datalist([
                                 $get('name'),
                                 Egg::find($get('egg_id'))?->name,
                             ])
-                            ->helperText('This is just a display only name to help you recognize what this Allocation is used for.')
+                            ->helperText('Optional display name to help you remember what these are.')
                             ->required(false),
                         Forms\Components\TagsInput::make('allocation_ports')
                             ->placeholder('Examples: 27015, 27017-27019')
-                            ->helperText('
+                            ->helperText(new HtmlString('
                                 These are the ports that users can connect to this Server through.
-                                They usually consist of the port forwarded ones.
-                            ')
+                                <br />
+                                You would have to port forward these on your home network.
+                            '))
                             ->label('Ports')
+                            ->inlineLabel()
                             ->live()
                             ->afterStateUpdated(function ($state, Forms\Set $set) {
                                 $ports = collect();
@@ -219,24 +222,13 @@ class CreateServer extends CreateRecord
                                     ($allocation->ip_alias ? " ($allocation->ip_alias)" : '')
                             )
                             ->placeholder('Select additional Allocations')
+                            ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                             ->relationship(
                                 'allocations',
                                 'ip',
                                 fn (Builder $query, Forms\Get $get, Forms\Components\Select $component, $state) => $query
                                     ->where('node_id', $get('../../node_id'))
-                                    ->whereNotIn(
-                                        'id',
-                                        collect(($repeater = $component->getParentRepeater())->getState())
-                                            ->pluck(
-                                                (string) str($component->getStatePath())
-                                                    ->after("{$repeater->getStatePath()}.")
-                                                    ->after('.'),
-                                            )
-                                            ->flatten()
-                                            ->diff(Arr::wrap($state))
-                                            ->filter(fn (mixed $siblingItemState): bool => filled($siblingItemState))
-                                            ->add($get('../../allocation_id'))
-                                    )
+                                    ->whereNot('id', $get('../../allocation_id'))
                                     ->whereNull('server_id'),
                             ),
                     ),
@@ -254,15 +246,16 @@ class CreateServer extends CreateRecord
                         'default' => 2,
                         'sm' => 2,
                         'md' => 2,
-                        'lg' => 6,
+                        'lg' => 5,
                     ])
                     ->relationship('egg', 'name')
                     ->searchable()
                     ->preload()
                     ->live()
-                    ->afterStateUpdated(function ($state, Forms\Set $set) {
-                        $egg = Egg::find($state);
+                    ->afterStateUpdated(function ($state, Forms\Set $set, Forms\Get $get, $old) {
+                        $egg = Egg::query()->find($state);
                         $set('startup', $egg->startup);
+                        $set('image', '');
 
                         $variables = $egg->variables ?? [];
                         $serverVariables = collect();
@@ -279,12 +272,23 @@ class CreateServer extends CreateRecord
                         }
 
                         $set('environment', $variables);
+
+                        $previousEgg = Egg::query()->find($old);
+                        if (!$get('name') || $previousEgg?->getKebabName() === $get('name')) {
+                            $set('name', $egg->getKebabName());
+                        }
                     })
                     ->required(),
 
                 Forms\Components\ToggleButtons::make('skip_scripts')
                     ->label('Run Egg Install Script?')
                     ->default(false)
+                    ->columnSpan([
+                        'default' => 1,
+                        'sm' => 1,
+                        'md' => 1,
+                        'lg' => 1,
+                    ])
                     ->options([
                         false => 'Yes',
                         true => 'Skip',
@@ -300,67 +304,54 @@ class CreateServer extends CreateRecord
                     ->inline()
                     ->required(),
 
-                Forms\Components\ToggleButtons::make('custom_image')
+                Forms\Components\Select::make('select_image')
+                    ->label('Docker Image Name')
+                    ->prefixIcon('tabler-brand-docker')
                     ->live()
-                    ->label('Custom Image?')
-                    ->default(false)
-                    ->formatStateUsing(function ($state, Forms\Get $get) {
-                        if ($state !== null) {
-                            return $state;
+                    ->afterStateUpdated(fn (Forms\Set $set, $state) => $set('image', $state))
+                    ->options(function ($state, Forms\Get $get, Forms\Set $set) {
+                        $egg = Egg::query()->find($get('egg_id'));
+                        $images = $egg->docker_images ?? [];
+
+                        $currentImage = $get('image');
+                        if (!$currentImage && $images) {
+                            $defaultImage = collect($images)->first();
+                            $set('image', $defaultImage);
+                            $set('select_image', $defaultImage);
                         }
 
-                        $images = Egg::find($get('egg_id'))->docker_images ?? [];
-
-                        return !in_array($get('image'), $images);
+                        return array_flip($images) + ['ghcr.io/custom-image' => 'Custom Image'];
                     })
-                    ->options([
-                        false => 'No',
-                        true => 'Yes',
-                    ])
-                    ->colors([
-                        false => 'primary',
-                        true => 'danger',
-                    ])
-                    ->icons([
-                        false => 'tabler-settings-cancel',
-                        true => 'tabler-settings-check',
-                    ])
-                    ->inline(),
-
-                Forms\Components\TextInput::make('image')
-                    ->hidden(fn (Forms\Get $get) => !$get('custom_image'))
-                    ->disabled(fn (Forms\Get $get) => !$get('custom_image'))
-                    ->label('Docker Image')
-                    ->placeholder('Enter a custom Image')
-                    ->columnSpan([
-                        'default' => 2,
-                        'sm' => 2,
-                        'md' => 2,
-                        'lg' => 4,
-                    ])
-                    ->required(),
-
-                Forms\Components\Select::make('image')
-                    ->hidden(fn (Forms\Get $get) => $get('custom_image'))
-                    ->disabled(fn (Forms\Get $get) => $get('custom_image'))
-                    ->label('Docker Image')
-                    ->prefixIcon('tabler-brand-docker')
-                    ->options(function (Forms\Get $get, Forms\Set $set) {
-                        $images = Egg::find($get('egg_id'))->docker_images ?? [];
-
-                        $set('image', collect($images)->first());
-
-                        return $images;
-                    })
-                    ->disabled(fn (Forms\Components\Select $component) => empty($component->getOptions()))
                     ->selectablePlaceholder(false)
                     ->columnSpan([
                         'default' => 2,
                         'sm' => 2,
                         'md' => 2,
-                        'lg' => 4,
-                    ])
-                    ->required(),
+                        'lg' => 3,
+                    ]),
+
+                Forms\Components\TextInput::make('image')
+                    ->label('Docker Image')
+                    ->prefixIcon('tabler-brand-docker')
+                    ->live()
+                    ->debounce(500)
+                    ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set) {
+                        $egg = Egg::query()->find($get('egg_id'));
+                        $images = $egg->docker_images ?? [];
+
+                        if (in_array($state, $images)) {
+                            $set('select_image', $state);
+                        } else {
+                            $set('select_image', 'ghcr.io/custom-image');
+                        }
+                    })
+                    ->placeholder('Enter a custom Image')
+                    ->columnSpan([
+                        'default' => 2,
+                        'sm' => 2,
+                        'md' => 2,
+                        'lg' => 3,
+                    ]),
 
                 Forms\Components\Fieldset::make('Application Feature Limits')
                     ->inlineLabel()
@@ -434,14 +425,19 @@ class CreateServer extends CreateRecord
 
                         Forms\Components\Repeater::make('server_variables')
                             ->relationship('serverVariables')
+                            ->saveRelationshipsBeforeChildrenUsing(null)
+                            ->saveRelationshipsUsing(null)
                             ->grid(2)
                             ->reorderable(false)
                             ->addable(false)
                             ->deletable(false)
                             ->default([])
                             ->hidden(fn ($state) => empty($state))
-                            ->schema([
-                                Forms\Components\TextInput::make('variable_value')
+                            ->schema(function () {
+
+                                $text = Forms\Components\TextInput::make('variable_value')
+                                    ->hidden($this->shouldHideComponent(...))
+                                    ->maxLength(191)
                                     ->rules([
                                         fn (Forms\Get $get): Closure => function (string $attribute, $value, Closure $fail) use ($get) {
                                             $validator = Validator::make(['validatorkey' => $value], [
@@ -454,17 +450,33 @@ class CreateServer extends CreateRecord
                                                 $fail($message);
                                             }
                                         },
-                                    ])
-                                    ->label(fn (Forms\Get $get) => $get('name'))
-                                    //->hint('Rule')
-                                    ->hintIcon('tabler-code')
-                                    ->hintIconTooltip(fn (Forms\Get $get) => $get('rules'))
-                                    ->prefix(fn (Forms\Get $get) => '{{' . $get('env_variable') . '}}')
-                                    ->helperText(fn (Forms\Get $get) => empty($get('description')) ? '—' : $get('description'))
-                                    ->maxLength(191),
+                                    ]);
 
-                                Forms\Components\Hidden::make('variable_id')->default(0),
-                            ])
+                                $select = Forms\Components\Select::make('variable_value')
+                                    ->hidden($this->shouldHideComponent(...))
+                                    ->options($this->getSelectOptionsFromRules(...))
+                                    ->selectablePlaceholder(false);
+
+                                $components = [$text, $select];
+
+                                /** @var Forms\Components\Component $component */
+                                foreach ($components as &$component) {
+                                    $component = $component
+                                        ->live()
+                                        ->hintIcon('tabler-code')
+                                        ->label(fn (Forms\Get $get) => $get('name'))
+                                        ->hintIconTooltip(fn (Forms\Get $get) => $get('rules'))
+                                        ->prefix(fn (Forms\Get $get) => '{{' . $get('env_variable') . '}}')
+                                        ->helperText(fn (Forms\Get $get) => empty($get('description')) ? '—' : $get('description'))
+                                        ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get, $state) {
+                                            $environment = $get($envPath = '../../environment');
+                                            $environment[$get('env_variable')] = $state;
+                                            $set($envPath, $environment);
+                                        });
+                                }
+
+                                return $components;
+                            })
                             ->columnSpan(2),
                     ]),
 
@@ -560,8 +572,34 @@ class CreateServer extends CreateRecord
         return $service->handle($data);
     }
 
-    //    protected function getRedirectUrl(): string
-    //    {
-    //        return $this->getResource()::getUrl('edit');
-    //    }
+    private function shouldHideComponent(Forms\Get $get, Forms\Components\Component $component): bool
+    {
+        $containsRuleIn = str($get('rules'))->explode('|')->reduce(
+            fn ($result, $value) => $result === true && !str($value)->startsWith('in:'), true
+        );
+
+        if ($component instanceof Forms\Components\Select) {
+            return $containsRuleIn;
+        }
+
+        if ($component instanceof Forms\Components\TextInput) {
+            return !$containsRuleIn;
+        }
+
+        throw new \Exception('Component type not supported: ' . $component::class);
+    }
+
+    private function getSelectOptionsFromRules(Forms\Get $get): array
+    {
+        $inRule = str($get('rules'))->explode('|')->reduce(
+            fn ($result, $value) => str($value)->startsWith('in:') ? $value : $result, ''
+        );
+
+        return str($inRule)
+            ->after('in:')
+            ->explode(',')
+            ->each(fn ($value) => str($value)->trim())
+            ->mapWithKeys(fn ($value) => [$value => $value])
+            ->all();
+    }
 }

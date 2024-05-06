@@ -39,7 +39,7 @@ class ListUsers extends ListRecords
                     ->visibleFrom('md')
                     ->label('Admin')
                     ->boolean()
-                    ->trueIcon('tabler-star')
+                    ->trueIcon('tabler-star-filled')
                     ->falseIcon('tabler-star-off')
                     ->sortable(),
                 Tables\Columns\IconColumn::make('use_totp')->label('2FA')
@@ -69,6 +69,7 @@ class ListUsers extends ListRecords
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
+            ->checkIfRecordIsSelectableUsing(fn (User $user) => !$user->servers_count)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
