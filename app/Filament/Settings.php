@@ -16,6 +16,6 @@ class Settings extends Page
 
     public function getTitle(): string
     {
-        return trans('strings.settings');
+        return __('strings.settings');
     }
 }
